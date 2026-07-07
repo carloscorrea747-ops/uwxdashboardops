@@ -832,27 +832,6 @@ main.content{display:flex;flex-direction:column;flex:1;min-height:0}
 /* Encabezado de sección dentro de una página (separa bloques de tarjetas) */
 .pg-section-title{font-size:13px;font-weight:600;color:var(--text-primary);margin:4px 0 9px;letter-spacing:.2px}
 .pg-section-title small{font-weight:500;color:var(--text-secondary);font-size:11px;margin-left:6px}
-/* ===== pg6 PROCESOS — resumen comparativo + mapa de flujo ===== */
-.proc-res{display:flex;flex-direction:column;gap:8px;margin-top:2px}
-.proc-res-row{display:grid;grid-template-columns:150px 150px 1fr 92px;align-items:center;gap:12px;font-size:12px}
-.proc-res-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.proc-res-tx{color:var(--text-secondary);font-size:11px;white-space:nowrap}
-.proc-res-bar{height:13px;background:var(--border-soft,rgba(128,128,128,.14));border-radius:7px;overflow:hidden}
-.proc-res-fill{display:block;height:100%;border-radius:7px;min-width:2px}
-.proc-res-lt{text-align:right;font-weight:600;white-space:nowrap;color:var(--text-primary)}
-.pflow{display:flex;flex-wrap:wrap;align-items:stretch;gap:4px;padding:6px 0 2px}
-.pflow-node{flex:0 0 auto;min-width:120px;max-width:172px;border:1px solid var(--border-medium,rgba(128,128,128,.28));border-top:3px solid var(--pf-accent,#888);border-radius:8px;padding:8px 11px;background:var(--bg-elev,rgba(128,128,128,.05));display:flex;flex-direction:column;gap:3px}
-.pflow-node-start{border-top-color:var(--text-secondary,#888);opacity:.92}
-.pflow-node-lbl{font-size:11.5px;font-weight:600;color:var(--text-primary);line-height:1.2}
-.pflow-node-cum{font-size:15px;font-weight:700;color:var(--pf-accent,var(--text-primary))}
-.pflow-node-start .pflow-node-cum{color:var(--text-secondary)}
-.pflow-node-fill{font-size:10px;color:var(--text-secondary)}
-.pflow-arrow{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:48px;color:var(--text-secondary)}
-.pflow-arrow-inc{font-size:10px;font-weight:600;color:var(--pf-accent,var(--text-secondary));white-space:nowrap}
-.pflow-arrow-line{font-size:17px;line-height:1}
-.pflow-foot{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border-soft,rgba(128,128,128,.18));font-size:11px;color:var(--text-secondary)}
-.pflow-foot b{color:var(--text-primary)}
-.pflow-foot-muted{opacity:.82;font-style:italic}
 /* Tablitas Property */
 .cal-prop-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border-soft)}
 .cal-prop-row:last-child{border-bottom:none}
@@ -1567,8 +1546,7 @@ svg .gridline{stroke:var(--border-soft);stroke-dasharray:2 3;stroke-width:1}
     <div class="tab" data-tab="2">ERRORES</div>
     <div class="tab" data-tab="3">CALIDAD</div>
     <div class="tab" data-tab="4">SLA</div>
-    <div class="tab" data-tab="5">PROCESOS</div>
-    <div class="tab" data-tab="6">UTILIZACIÓN</div>
+    <div class="tab" data-tab="5">UTILIZACIÓN</div>
   </div>
 
   <main class="content" id="main">
@@ -1727,34 +1705,6 @@ svg .gridline{stroke:var(--border-soft);stroke-dasharray:2 3;stroke-width:1}
           <h3>Property · Actualización de datos</h3>
           <div id="cal-prop-actual"></div>
         </div>
-      </div>
-    </div>
-
-    <!-- =============== PG6 — PROCESOS =============== -->
-    <div class="page" id="pg6">
-      <!-- Fila 1: resumen comparativo por proceso (volumen + tiempo end-to-end) -->
-      <div class="cc full" data-doc-key="proc-resumen" style="margin-bottom:11px">
-        <h3>Resumen por proceso <small>(volumen y Lead Time end-to-end promedio · filtros aplicados)</small></h3>
-        <div id="proc-resumen"></div>
-      </div>
-
-      <!-- Fila 2: mapa de flujo (tiempo promedio acumulado por etapa) — una tarjeta por proceso -->
-      <h3 class="pg-section-title">Mapa de proceso <small>(promedio típico acumulado por etapa desde la recepción en el HUB · recortado a 5 días para excluir atípicos)</small></h3>
-      <div class="cc full" data-doc-key="proc-flow" style="margin-bottom:11px">
-        <h3>Renewal</h3>
-        <div id="proc-flow-renewal"></div>
-      </div>
-      <div class="cc full" data-doc-key="proc-flow" style="margin-bottom:11px">
-        <h3>New Business</h3>
-        <div id="proc-flow-newbusiness"></div>
-      </div>
-      <div class="cc full" data-doc-key="proc-flow" style="margin-bottom:11px">
-        <h3>Endorsement</h3>
-        <div id="proc-flow-endorsement"></div>
-      </div>
-      <div class="cc full" data-doc-key="proc-flow" style="margin-bottom:11px">
-        <h3>Lost &amp; Declined</h3>
-        <div id="proc-flow-lostdeclined"></div>
       </div>
     </div>
 
@@ -1955,27 +1905,6 @@ function startApp(){
  *  Las partes que el Web Worker necesita (COLUMNS, COUNTRY_NORM) se inyectan
  *  serializadas en getAggregatorSource().
  * ===================================================================== */
-// ===== Fuente única de las 15 etapas-fecha del MAPA DE PROCESO (pestaña PROCESOS) =====
-// De aquí derivan: las entradas de CONFIG.COLUMNS (proyección), STAGE_COLS (worker) y
-// PROC_STAGES (etiquetas del render). Editar/reordenar SOLO aquí — los tres quedan
-// alineados por índice automáticamente. `col` = encabezado Excel; `label` = etiqueta UI.
-const STAGE_DEFS = [
-  { col:"Fecha de entrega a UW",                            label:"Entrega a UW",                 aliases:["fecha de entrega a uw","fecha entrega uw"] },
-  { col:"Fecha de envío del endoso al broker",              label:"Envío del endoso al broker",   aliases:["fecha de envio del endoso al broker","fecha envio endoso broker","fecha de envío del endoso al bróker","fecha de envio del endoso al broker "] },
-  { col:"Fecha de la última actualización de UW",           label:"Última actualización de UW",   aliases:["fecha de la ultima actualizacion de uw","fecha ultima actualizacion uw","fecha de la última actualizacion de uw"] },
-  { col:"Fecha de envío de solicitud de aprobación a UW",   label:"Solicitud de aprobación a UW", aliases:["fecha de envio de solicitud de aprobacion a uw","fecha envio solicitud aprobacion uw","fecha de envío de solicitud de aprobación a uw"] },
-  { col:"Fecha de recepción de aprobación de UW",           label:"Recepción de aprobación de UW",aliases:["fecha de recepcion de aprobacion de uw","fecha recepcion aprobacion uw","fecha de recepción de aprobacion de uw"] },
-  { col:"Fecha de envío a emisión",                         label:"Envío a emisión",              aliases:["fecha de envio a emision","fecha envio a emision","fecha de envío a emisión"] },
-  { col:"Fecha de cierre de proceso de endoso",             label:"Cierre de proceso de endoso",  aliases:["fecha de cierre de proceso de endoso","fecha cierre proceso endoso"] },
-  { col:"Fecha de inicio de Premodelación",                 label:"Inicio de Premodelación",      aliases:["fecha de inicio de premodelacion","fecha inicio premodelacion","fecha de inicio de premodelación"] },
-  { col:"Fecha de terminación de Premodelación",            label:"Terminación de Premodelación", aliases:["fecha de terminacion de premodelacion","fecha terminacion premodelacion","fecha de terminación de premodelacion"] },
-  { col:"Fecha de inicio de Modelación",                    label:"Inicio de Modelación",         aliases:["fecha de inicio de modelacion","fecha inicio modelacion","fecha de inicio de modelación"] },
-  { col:"Fecha de terminación de Modelación",               label:"Terminación de Modelación",    aliases:["fecha de terminacion de modelacion","fecha terminacion modelacion","fecha de terminación de modelacion"] },
-  { col:"Fecha de inicio de Emisión",                       label:"Inicio de Emisión",            aliases:["fecha de inicio de emision","fecha inicio emision","fecha de inicio de emisión"] },
-  { col:"Fecha de terminación de Emisión",                  label:"Terminación de Emisión",       aliases:["fecha de terminacion de emision","fecha terminacion emision","fecha de terminación de emisión"] },
-  { col:"Fecha de inicio de Actualización",                 label:"Inicio de Actualización",      aliases:["fecha de inicio de actualizacion","fecha inicio actualizacion","fecha de inicio de actualización"] },
-  { col:"Fecha de terminación de Actualización",            label:"Terminación de Actualización", aliases:["fecha de terminacion de actualizacion","fecha terminacion actualizacion","fecha de terminación de actualización"] }
-];
 // ===== Fuente única de los 4 subprocesos SLA de Property (pestañas CALIDAD/SLA) =====
 // De aquí derivan: el acumulador del worker (buildDatasetsFromRows), los campos
 // emitidos al master (sla_pre_1/2/3, sla_mod_1/2/3, ...) y las tablitas Property
@@ -1988,7 +1917,7 @@ const SUBPROC_DEFS = [
   { pre:"sla_act", col:"SLA Actualización", id:"actual", lbl:"Actualización" }
 ];
 const CONFIG = {
-  CACHE: { DB_NAME:"uwx-intel-cache", DB_STORE:"kv", SCHEMA_VERSION:"uwx-v4.1" },
+  CACHE: { DB_NAME:"uwx-intel-cache", DB_STORE:"kv", SCHEMA_VERSION:"uwx-v5.0" },
   // Jornada laboral: horas por analista por día. LEGADO/referencia histórica —
   // la jornada operativa hoy es DIFERENCIADA por HUB vía _jornadaHub() (Colombia/
   // México 7h · Brasil 6.5h · resto 7h); este valor único ya no se usa en cálculos.
@@ -2071,10 +2000,7 @@ const CONFIG = {
     { key:"SLA Premodelación",                             required:false, aliases:["sla premodelacion","sla premodelación","sla premodel"] },
     { key:"SLA Modelación",                                required:false, aliases:["sla modelacion","sla modelación"] },
     { key:"SLA Emisión",                                   required:false, aliases:["sla emision","sla emisión"] },
-    { key:"SLA Actualización",                             required:false, aliases:["sla actualizacion","sla actualización"] },
-    // Pestaña PROCESOS — 15 columnas de fecha del flujo, derivadas de STAGE_DEFS (fuente
-    // única). Todas opcionales; vienen como texto es-LATAM y las parsea _parseStageDate.
-    ...STAGE_DEFS.map(s => ({ key:s.col, required:false, aliases:s.aliases }))
+    { key:"SLA Actualización",                             required:false, aliases:["sla actualizacion","sla actualización"] }
   ]
 };
 
@@ -2130,11 +2056,6 @@ let DATE_MIN=null, DATE_MAX=null;
  *   - modal global "Diccionario" (tabla completa).
  */
 const METRIC_DOCS = {
-  /* === pg6 PROCESOS (mapa de proceso) === */
-  "proc-resumen": {title:"PROCESOS · Resumen por proceso", cols:"Proceso (col #4), Cantidad de pólizas (col #83), Lead Time UWX (col #38)",
-                   calc:"Por cada proceso: nº de transacciones, su % del total y el Lead Time promedio de punta a punta."},
-  "proc-flow": {title:"PROCESOS · Mapa de flujo (tiempo promedio por etapa)", cols:"Fecha de recepción en el HUB (col #0, ancla t=0) + 15 columnas de fecha del flujo: entrega a UW, envío del endoso al broker, última actualización de UW, solicitud/recepción de aprobación a UW, envío a emisión, cierre de proceso de endoso, inicio/terminación de Premodelación, inicio/terminación de Modelación, inicio/terminación de Emisión, inicio/terminación de Actualización",
-                calc:"Tiempo promedio de cada etapa desde que la transacción llega al HUB (recortado a 5 días para no inflar con atípicos; solo etapas presentes en ≥15% de los casos)."},
   /* === KPI rail V2 (8 tarjetas) === */
   "kpi-tx-tipos":   {title:"T1 · Pólizas por tipo de proceso", cols:"Proceso (col #4), Cantidad de pólizas (col #83)",
                      calc:"Total de transacciones y cómo se reparten por tipo de proceso (Renewal, Endorsement, etc.)."},
@@ -5130,31 +5051,34 @@ function _drawUtilTrend(rows){
 /* ============================================================
  *  ORQUESTACIÓN
  * ============================================================ */
-function drawAll(){
-  drawDqNotices();     // avisos de calidad inline (pg0)
-  drawKPIs();
-  // pg0 VISIÓN GLOBAL
-  drawProcPais();
-  drawPorHub();
-  drawPorLob();
-  drawHtTrend();
-  drawLtTrend();
-  drawTxTrend();
-  drawEstado();
+/* Mapa página → funciones de render. Las function declarations están hoisted
+ * dentro de startApp(), así que referenciarlas aquí es seguro aunque se
+ * definan más abajo en el archivo. */
+const PAGE_DRAWS = {
+  // pg0 VISIÓN GLOBAL (incluye avisos DQ inline + rail de KPIs)
+  pg0: [drawDqNotices, drawKPIs, drawProcPais, drawPorHub, drawPorLob, drawHtTrend, drawLtTrend, drawTxTrend, drawEstado],
   // pg4 ANALISTA 360
-  drawAnalistaTable();
+  pg4: [drawAnalistaTable],
   // pg2 ERRORES
-  drawErrPais();
-  drawErrProc();
-  drawErroresFechas();
+  pg2: [drawErrPais, drawErrProc, drawErroresFechas],
   // pg3 CALIDAD
-  drawCalidad();
+  pg3: [drawCalidad],
   // pg5 SLA
-  drawSla();
-  // pg6 PROCESOS
-  drawProcesos();
+  pg5: [drawSla],
   // pg7 UTILIZACIÓN
-  drawUtilizacion();
+  pg7: [drawUtilizacion]
+};
+/* OPTIMIZACIÓN (2026-07): lazy render — redibuja SOLO la página activa.
+ * Es correcto porque goTab() vuelve a invocar drawAll() en cada cambio de
+ * pestaña: toda página se redibuja al activarse con los filtros vigentes.
+ * Antes cada cambio de filtro redibujaba las 7 páginas (~17 componentes);
+ * ahora solo la visible. Los números no cambian: solo CUÁNDO se calculan. */
+function drawAll(){
+  const act = document.querySelector(".page.active");
+  const fns = act ? PAGE_DRAWS[act.id] : null;
+  if(fns){ fns.forEach(f => f()); return; }
+  // Fallback defensivo: sin página activa identificable, dibujar todo.
+  for(const k in PAGE_DRAWS) PAGE_DRAWS[k].forEach(f => f());
 }
 
 /* ============================================================
@@ -5364,122 +5288,6 @@ function drawSla(){
 }
 
 /* ============================================================
- *  pg6 — PROCESOS (mapa de proceso)
- *  Modela cada proceso de negocio con el TIEMPO PROMEDIO de sus etapas, leído de
- *  los campos st_sum/st_n del master (Σ horas y N por etapa desde la recepción en
- *  el HUB; ver STAGE_COLS en buildDatasetsFromRows). Filter-aware: agrega
- *  filteredMaster() por Proceso, así que respeta todos los slicers.
- * ============================================================ */
-// Etiquetas de las 15 etapas-fecha del flujo, derivadas de STAGE_DEFS (fuente única,
-// definida junto a CONFIG). Alineadas por índice con STAGE_COLS del worker.
-const PROC_STAGES = STAGE_DEFS.map(s => s.label);
-// % mínimo de tx con tiempo medible para que una etapa se dibuje en el flujo de un
-// proceso (filtra el ruido: etapas que ese proceso casi nunca usa).
-const PROC_FILL_MIN = 15;
-
-/* Formatea horas para el flujo: ≥48h → "Xd Yh"; si no, "Xh Ymin" (fmtHM). */
-function _fmtFlowH(h){
-  if(h==null || isNaN(h)) return "—";
-  if(h >= 48){ const d=Math.floor(h/24), rem=Math.round(h-d*24); return rem>0 ? `${d}d ${rem}h` : `${d}d`; }
-  return fmtHM(h);
-}
-
-/* Agrega filteredMaster() UNA sola vez para TODOS los procesos → Map<proceso,
- * {tx, ltDias, stages}>. Antes se hacía una pasada por proceso (×8 por render:
- * 4 del resumen + 4 de los flujos); ahora una sola. Por etapa: tiempo promedio
- * acumulado (Σ horas / N) y % de llenado (N con tiempo medible / Σ transacciones);
- * además tx y Lead Time UWX end-to-end ponderado por pólizas. */
-function _aggProcesos(){
-  const nS = PROC_STAGES.length;
-  const acc = new Map();   // proceso → {tx, ltSum, ltBase, sum[], cnt[]}
-  for(const r of filteredMaster()){
-    const proc = r.Proceso; if(!proc) continue;
-    let a = acc.get(proc);
-    if(!a){ a = { tx:0, ltSum:0, ltBase:0, sum:new Array(nS).fill(0), cnt:new Array(nS).fill(0) }; acc.set(proc, a); }
-    a.tx += r.transacciones || 0;
-    a.ltSum += (+r.pol_lt_sum || 0); a.ltBase += (+r.pol_lt_base || 0);
-    const ss = r.st_sum, sn = r.st_n;
-    if(ss && sn){ for(let j=0;j<nS;j++){ a.sum[j] += (+ss[j]||0); a.cnt[j] += (+sn[j]||0); } }
-  }
-  const out = new Map();
-  for(const [proc, a] of acc){
-    const stages = [];
-    for(let j=0;j<nS;j++){
-      if(a.cnt[j] > 0) stages.push({ label:PROC_STAGES[j], avgH:a.sum[j]/a.cnt[j], n:a.cnt[j], fill: a.tx>0 ? a.cnt[j]/a.tx*100 : 0 });
-    }
-    out.set(proc, { tx:a.tx, ltDias: a.ltBase>0 ? a.ltSum/a.ltBase : null, stages });
-  }
-  return out;
-}
-
-/* Dibuja el flujo de un proceso: nodo inicial "Recepción en el HUB" (t=0) + las
- * etapas con llenado ≥ PROC_FILL_MIN, ordenadas por tiempo acumulado ascendente.
- * Cada flecha muestra el incremento de tiempo respecto a la etapa anterior. */
-function _drawProcFlow(hostId, proceso, a){
-  const host = $(hostId); if(!host) return;
-  if(!a || !(a.tx > 0)){ host.innerHTML = '<div class="empty">Sin transacciones de este proceso para los filtros aplicados</div>'; return; }
-  const vis = a.stages.filter(s=> s.fill >= PROC_FILL_MIN).sort((x,y)=> x.avgH - y.avgH);
-  const accent = colorFor(PROC_COLOR, proceso);
-  const nodes = [{ label:"Recepción en el HUB", cum:0, fill:100, isStart:true }]
-    .concat(vis.map(s=>({ label:s.label, cum:s.avgH, fill:s.fill })));
-  let html = `<div class="pflow" style="--pf-accent:${accent}">`;
-  nodes.forEach((nd,i)=>{
-    if(i > 0){
-      const inc = nd.cum - nodes[i-1].cum;
-      html += `<div class="pflow-arrow"><span class="pflow-arrow-inc">+${_fmtFlowH(inc)}</span><span class="pflow-arrow-line">→</span></div>`;
-    }
-    html += `<div class="pflow-node${nd.isStart?' pflow-node-start':''}">`+
-      `<div class="pflow-node-lbl">${safe(nd.label)}</div>`+
-      `<div class="pflow-node-cum">${nd.isStart ? '0' : _fmtFlowH(nd.cum)}</div>`+
-      `<div class="pflow-node-fill">${fmtPct(nd.fill,0)} de tx</div>`+
-    `</div>`;
-  });
-  html += `</div>`;
-  const hidden = a.stages.length - vis.length;
-  html += `<div class="pflow-foot">`+
-    `<span><b>${fmtInt(a.tx)}</b> transacciones</span>`+
-    `<span>Lead Time end-to-end: <b>${a.ltDias==null ? '—' : fmtHMdias(a.ltDias)}</b></span>`+
-    (hidden>0 ? `<span class="pflow-foot-muted">${hidden} etapa(s) con &lt;${PROC_FILL_MIN}% de llenado no se muestran</span>` : ``)+
-  `</div>`;
-  host.innerHTML = html;
-}
-
-/* Resumen comparativo de los 4 procesos: N tx, % del total y Lead Time end-to-end
- * promedio (barra relativa al proceso más lento). Filter-aware. */
-function _drawProcResumen(aggByProc){
-  const host = $("#proc-resumen"); if(!host) return;
-  const PROCS = ["Renewal","New Business","Endorsement","Lost & Declined"];
-  const rows = PROCS.map(p=>{ const a=aggByProc.get(p); return { p, tx:a?a.tx:0, lt:a?a.ltDias:null }; }).filter(r=> r.tx>0);
-  if(!rows.length){ host.innerHTML = '<div class="empty">Sin transacciones para los filtros aplicados</div>'; return; }
-  const totTx = rows.reduce((s,r)=> s+r.tx, 0);
-  const maxLt = Math.max(...rows.map(r=> r.lt||0), 0.0001);
-  let html = '<div class="proc-res">';
-  rows.forEach(r=>{
-    const accent = colorFor(PROC_COLOR, r.p);
-    const share = totTx>0 ? r.tx/totTx*100 : 0;
-    const ltW = r.lt!=null ? Math.max(2, r.lt/maxLt*100) : 0;
-    html += `<div class="proc-res-row">`+
-      `<span class="proc-res-name" style="color:${accent}">${safe(r.p)}</span>`+
-      `<span class="proc-res-tx">${fmtInt(r.tx)} tx · ${fmtPct(share,1)}</span>`+
-      `<span class="proc-res-bar"><span class="proc-res-fill" style="width:${ltW}%;background:${accent}"></span></span>`+
-      `<span class="proc-res-lt">${r.lt==null ? '—' : fmtHMdias(r.lt)}</span>`+
-    `</div>`;
-  });
-  html += '</div><div class="pflow-foot"><span class="pflow-foot-muted">Lead Time UWX end-to-end promedio ponderado por pólizas (24 h/día). La barra es relativa al proceso más lento del periodo filtrado.</span></div>';
-  host.innerHTML = html;
-}
-
-/* pg6 — PROCESOS: resumen comparativo + un mapa de flujo por proceso. */
-function drawProcesos(){
-  const aggByProc = _aggProcesos();   // una sola pasada sobre filteredMaster() para los 4 procesos
-  _drawProcResumen(aggByProc);
-  _drawProcFlow("#proc-flow-renewal",      "Renewal",         aggByProc.get("Renewal"));
-  _drawProcFlow("#proc-flow-newbusiness",  "New Business",    aggByProc.get("New Business"));
-  _drawProcFlow("#proc-flow-endorsement",  "Endorsement",     aggByProc.get("Endorsement"));
-  _drawProcFlow("#proc-flow-lostdeclined", "Lost & Declined", aggByProc.get("Lost & Declined"));
-}
-
-/* ============================================================
  *  ESTADO DEL DASHBOARD: vacío vs. con datos
  * ============================================================ */
 function showEmptyState(){
@@ -5521,8 +5329,6 @@ function clearData(){
    // pg5 SLA por proceso
    "#cal-sla-proc-renewal","#cal-sla-proc-endorsement","#cal-sla-proc-lostdeclined","#cal-sla-proc-newbusiness",
    "#cal-prop-premod","#cal-prop-model","#cal-prop-emis","#cal-prop-actual",
-   // pg6 PROCESOS
-   "#proc-resumen","#proc-flow-renewal","#proc-flow-newbusiness","#proc-flow-endorsement","#proc-flow-lostdeclined",
    // pg7 UTILIZACIÓN
    "#util-kpi-global","#util-kpi-hubs","#chart-util-trend",
    // slicers
@@ -5763,7 +5569,7 @@ function getAggregatorSource(){
   // Las declaraciones `function` cargadas vía importScripts quedan en el
   // scope global del worker (self.*), accesibles por el WORKER_SRC.
   const fns = [
-    _num, _str, _norm, _country, _isYes, _isNo, _isNoError, _excelToDate, _parseStageDate, _yearMonth, _dayStr, _isPlaceholderDate,
+    _num, _str, _norm, _country, _isYes, _isNo, _isNoError, _excelToDate, _yearMonth, _dayStr, _isPlaceholderDate,
     _median, _round, _isoWeekKey, _isBadClipboard,
     parseActiveAnalysts,
     projectRows,
@@ -5774,7 +5580,6 @@ function getAggregatorSource(){
   const consts = `
     var COL_SPEC = ${JSON.stringify(CONFIG.COLUMNS)};
     var COUNTRY_NORM = ${JSON.stringify(CONFIG.COUNTRY_NORM)};
-    var STAGE_DEFS = ${JSON.stringify(STAGE_DEFS)};
     var SUBPROC_DEFS = ${JSON.stringify(SUBPROC_DEFS)};
   `;
   __aggSourceCache = consts + "\n" + fns.map(f => f.toString()).join("\n\n");
@@ -6394,37 +6199,6 @@ function _isPlaceholderDate(d){
   // fechas dummy típicas: 1899, 1900, 9999, etc.
   return y < 2000 || y > 2100;
 }
-/* Parser de las 15 columnas de fecha del MAPA DE PROCESO (pestaña PROCESOS).
- * A diferencia del resto, estas celdas suelen venir como TEXTO en formato
- * es-LATAM "DD/MM/YYYY h:mm:ss a. m." (día primero, AM/PM en español, con NBSP),
- * que new Date() NO sabe parsear. Se parsea a mano (dayfirst) y se construye con
- * Date.UTC para quedar en el MISMO marco que el resto de fechas (que el código lee
- * vía getUTC*), de modo que el delta contra la recepción en el HUB sea correcto.
- * Sentinels ('0','-','SÍ','No', vacío) → null. También acepta Date/serial e ISO. */
-function _parseStageDate(v){
-  if(v == null || v === "") return null;
-  if(typeof v === "object" && typeof v.getTime === "function"){ const t=v.getTime(); return isFinite(t)?v:null; }
-  if(typeof v === "number") return _excelToDate(v);
-  const s = String(v).trim();
-  if(!s) return null;
-  // OPTIMIZACIÓN (2026-07): fast-path para sentinels frecuentes ('0','-','SÍ','No').
-  // La fecha válida más corta que acepta el regex ("1/1/24") tiene 6 caracteres.
-  if(s.length < 6) return null;
-  const low = s.toLowerCase().replace(/ /g," ").replace(/\s+/g," ");
-  const m = low.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ t]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(a\.?\s?m\.?|p\.?\s?m\.?|am|pm)?)?/);
-  if(m){
-    let day=+m[1], mon=+m[2], yr=+m[3], hh=m[4]?+m[4]:0, mm=m[5]?+m[5]:0, ss=m[6]?+m[6]:0;
-    if(yr<100) yr += 2000;
-    const ap = m[7];
-    if(ap){ const isP = ap.charAt(0)==="p"; if(isP && hh<12) hh+=12; if(!isP && hh===12) hh=0; }
-    if(mon<1 || mon>12 || day<1 || day>31) return null;
-    const t = Date.UTC(yr, mon-1, day, hh, mm, ss);
-    return isFinite(t) ? new Date(t) : null;
-  }
-  // Fallback ISO (yyyy-mm-dd…) — evita falsos positivos con sentinels '0','-','SÍ'.
-  if(/^\d{4}-\d{1,2}-\d{1,2}/.test(s)){ const d=new Date(s); return isNaN(d.getTime())?null:d; }
-  return null;
-}
 function _median(arr){
   if(!arr.length) return null;
   const a = arr.slice().sort((x,y)=>x-y);
@@ -6449,17 +6223,6 @@ async function buildDatasetsFromRows(rows, onProgress, activeInfo){
   // Filtro de analistas ACTIVOS (hoja "Analistas"). Si activeSet === null no hay
   // filtro válido → TODAS las filas cuentan como activas (comportamiento histórico).
   const activeSet = (activeInfo && activeInfo.set) ? activeInfo.set : null;
-  // ===== Pestaña PROCESOS — mapa de proceso =====
-  // Columnas de fecha del flujo, derivadas de STAGE_DEFS (fuente única; inyectada al
-  // worker en getAggregatorSource). STAGE_COLS (col) y PROC_STAGES (label del render)
-  // salen del mismo array → alineadas por índice sin mantenimiento manual.
-  const STAGE_COLS = STAGE_DEFS.map(s => s.col);
-  const N_STAGES = STAGE_COLS.length;
-  const STAGE_NEG_TOL_H = -48;     // tolerancia de reloj/orden (h): por debajo = sentinel/placeholder/fecha previa
-  const STAGE_CAP_H = 365 * 24;    // tope de validez (h): por encima = error de fecha (años) → se descarta
-  const STAGE_WINS_H = 120;        // tope de winsorización (h = 5 días): los casos legítimos pero atípicos
-                                   // (>5 días) cuentan pero aportan a lo sumo 120h → el promedio refleja lo
-                                   // TÍPICO sin que pocas semanas lo inflen. El delta crudo se conserva en r.__st.
   // -- Pase 1: enriquecer cada fila con los campos derivados de uso múltiple --
   const CHUNK = 5000;
   for(let i=0; i<N; i+=CHUNK){
@@ -6480,25 +6243,6 @@ async function buildDatasetsFromRows(rows, onProgress, activeInfo){
       // válida (activeSet null) toda fila se considera activa.
       r.__resp   = _str(r["Responsable HUB"]);
       r.__active = activeSet ? (r.__resp != null && activeSet.has(r.__resp)) : true;
-      // Mapa de proceso (pestaña PROCESOS): horas de cada etapa-fecha desde la
-      // recepción en el HUB. Descarta no parseables, placeholders 1899/1900 y
-      // deltas fuera de [STAGE_NEG_TOL_H, STAGE_CAP_H] (sentinels '0'/'-'→negativo
-      // enorme; errores de fecha→positivo enorme). El delta válido se clampa a ≥0.
-      const _hubT = (r.__date && !_isPlaceholderDate(r.__date)) ? r.__date.getTime() : null;
-      if(_hubT != null){
-        let st = null;
-        for(let s=0; s<N_STAGES; s++){
-          const d = _parseStageDate(r[STAGE_COLS[s]]);
-          if(!d || _isPlaceholderDate(d)) continue;
-          const h = (d.getTime() - _hubT) / 3600000;
-          if(h < STAGE_NEG_TOL_H || h > STAGE_CAP_H) continue;
-          if(!st) st = new Array(N_STAGES).fill(null);
-          st[s] = h > 0 ? h : 0;
-        }
-        r.__st = st;
-      } else {
-        r.__st = null;
-      }
       // Descartar filas con basura del portapapeles de Excel en columnas clave.
       r.__bad = _isBadClipboard(r["Responsable HUB"])
              || _isBadClipboard(r["País"])
@@ -6604,8 +6348,6 @@ async function buildDatasetsFromRows(rows, onProgress, activeInfo){
               // por índice con SUBPROC_DEFS (Premodelación/Modelación/Emisión/Actualización) -----
               sub: SUBPROC_DEFS.map(()=>({1:0, 2:0, 3:0})),
               errExt:{}, errInt:{},              // {tipoError: conteo} (excluye "no error")
-              // ----- pestaña PROCESOS: Σ horas y N por etapa (mapa de proceso) -----
-              stSum: new Array(N_STAGES).fill(0), stN: new Array(N_STAGES).fill(0),
               analistas: new Set(), analistasAct: new Set() };
         aggMaster.set(k, s);
       }
@@ -6642,8 +6384,6 @@ async function buildDatasetsFromRows(rows, onProgress, activeInfo){
       // Tipo de error externo/interno (excluye "Sin error"/"Sem erro"/"En proceso"/vacío).
       { const te=_str(r["Tipo de error externo"]); if(te && !_isNoError(te)) s.errExt[te]=(s.errExt[te]||0)+1; }
       { const ti=_str(r["Tipo de error interno"]); if(ti && !_isNoError(ti)) s.errInt[ti]=(s.errInt[ti]||0)+1; }
-      // ----- pestaña PROCESOS: acumular tiempo de cada etapa (winsorizado a STAGE_WINS_H) -----
-      if(r.__st){ for(let s2=0; s2<N_STAGES; s2++){ const d=r.__st[s2]; if(d!=null){ s.stSum[s2]+=(d>STAGE_WINS_H?STAGE_WINS_H:d); s.stN[s2]++; } } }
     }
 
     // Slice diario (HT/LT trend SEMANA y DÍA) — mismas dims que master con Segmentación
@@ -6769,10 +6509,7 @@ async function buildDatasetsFromRows(rows, onProgress, activeInfo){
       lt_sum_dias_act:    _round(s.ltSumA, 4),
       lt_n_act:           s.ltNA,
       analistas: Array.from(s.analistas),
-      analistas_act: Array.from(s.analistasAct),   // T6 — solo activos
-      // ---- pestaña PROCESOS (mapa de proceso) ----
-      st_sum: s.stSum.map(x=>_round(x,2)),   // Σ horas (winsorizadas a 5 días) por etapa desde recepción en el HUB
-      st_n:   s.stN.slice()                  // N tx con tiempo medible por etapa
+      analistas_act: Array.from(s.analistasAct)    // T6 — solo activos
     };
     // SLA por subproceso Property (sla_pre_1/2/3, sla_mod_1/2/3, ...), vía SUBPROC_DEFS.
     for(let si=0; si<SUBPROC_DEFS.length; si++){
